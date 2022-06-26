@@ -15,6 +15,19 @@ resource "aws_s3_bucket" "ssr-artifacts" {
   }
 }
 
+resource "aws_s3_bucket" "app-artifacts" {
+  bucket = "ssr-app-artifacts"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  tags = {
+    Name = "App Artifacts"
+  }
+}
+
 module "lambda_at_edge" {
   source = "git@github.com:transcend-io/terraform-aws-lambda-at-edge.git"
   name = "react_ssr_handler"
@@ -26,6 +39,9 @@ module "lambda_at_edge" {
 
 module "cloudfront_website" {
   source = "./infra/modules/cloudfront"
-  domain_name = "ssr-app.com"
   lambda_arn = module.lambda_at_edge.arn
+  app_artifact_bucket = aws_s3_bucket.app-artifacts.id
+  app_artifact_bucket_arn = aws_s3_bucket.app-artifacts.arn
+  app_artifact_bucket_regional_domain_name = aws_s3_bucket.app-artifacts.bucket_regional_domain_name
+  app_source_dir = "${path.module}/app/build"
 }

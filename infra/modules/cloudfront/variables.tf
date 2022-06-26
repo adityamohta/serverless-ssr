@@ -1,25 +1,20 @@
-
-variable "domain_name" {
-  description = "Domain name"
-  type        = string
-}
-
 variable "lambda_arn" {
   description = "Lambda Arn"
   type        = string
 }
 
-#variable "domain_cname" {
-#  description = "Domain C Name"
-#  type        = string
-#}
-#
-#variable "domain_certificate_arn" {
-#  description = "Domain Certificate ARN (Must be present in us-east-1)"
-#  type        = string
-#}
-#
-#variable "domain_zone_id" {
-#  description = "Domain Certificate ARN (Must be present in us-east-1)"
-#  type        = string
-#}
+variable app_artifact_bucket {
+  description = "Name of the S3 bucket to upload versioned artifacts to"
+}
+
+variable app_artifact_bucket_arn {
+  description = "ARN of the S3 bucket to upload versioned artifacts to"
+}
+
+variable app_artifact_bucket_regional_domain_name {
+  description = "Regional domain name of the S3 bucket to upload versioned artifacts to"
+}
+
+variable app_source_dir {
+  description = "An absolute path to the directory containing the code to upload to app artifacts s3 bucket"
+}

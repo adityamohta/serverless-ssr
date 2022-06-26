@@ -1,4 +1,4 @@
 
 locals {
-  s3_origin_id = var.domain_name
+  s3_origin_id = var.app_artifact_bucket
 }

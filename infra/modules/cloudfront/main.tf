@@ -1,18 +1,3 @@
-//Reference: https://medium.com/geekculture/serve-your-react-app-with-aws-cloudfront-using-gitlab-and-terraform-322b2526943e
-
-resource "aws_s3_bucket" "cf_s3_bucket" {
-  bucket = var.domain_name
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
-
-  tags = {
-    Name = "${var.domain_name} Website"
-  }
-}
-
 resource "aws_s3_bucket" "cloudfront_access_logs_bucket" {
   bucket = "cloudfront-access-logs-bucket-v2"
   acl    = "private"
@@ -27,7 +12,7 @@ resource "aws_s3_bucket" "cloudfront_access_logs_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "block_public_access" {
-  bucket = aws_s3_bucket.cf_s3_bucket.id
+  bucket = var.app_artifact_bucket
 
   block_public_acls       = true
   block_public_policy     = true
@@ -36,7 +21,7 @@ resource "aws_s3_bucket_public_access_block" "block_public_access" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "${var.domain_name} OAI"
+  comment = "${var.app_artifact_bucket} OAI"
 
   lifecycle {
     create_before_destroy = true
@@ -45,7 +30,7 @@ resource "aws_cloudfront_origin_access_identity" "oai" {
 
 resource "aws_cloudfront_distribution" "support_cf_distribution" {
   origin {
-    domain_name = aws_s3_bucket.cf_s3_bucket.bucket_regional_domain_name
+    domain_name = var.app_artifact_bucket_regional_domain_name
     origin_id   = local.s3_origin_id
 
     s3_origin_config {
@@ -165,10 +150,10 @@ resource "aws_cloudfront_distribution" "support_cf_distribution" {
   }
 }
 
-data "aws_iam_policy_document" "cf_s3_bucket_policy" {
+data "aws_iam_policy_document" "s3_bucket_policy" {
   statement {
     actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.cf_s3_bucket.arn}/*"]
+    resources = ["${var.app_artifact_bucket_arn}/*"]
 
     principals {
       type        = "AWS"
@@ -177,7 +162,12 @@ data "aws_iam_policy_document" "cf_s3_bucket_policy" {
   }
 }
 
-resource "aws_s3_bucket_policy" "cf_s3_bucket_policy" {
-  bucket = aws_s3_bucket.cf_s3_bucket.id
-  policy = data.aws_iam_policy_document.cf_s3_bucket_policy.json
+resource "aws_s3_bucket_policy" "s3_bucket_policy" {
+  bucket = var.app_artifact_bucket
+  policy = data.aws_iam_policy_document.s3_bucket_policy.json
+}
+
+module "template_files" {
+  source = "hashicorp/dir/template"
+  base_dir = var.app_source_dir
 }

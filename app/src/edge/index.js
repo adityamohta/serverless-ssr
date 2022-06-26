@@ -1,11 +1,7 @@
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: MIT-0
-
-// import React from "react";
-// import ReactDOMServer from "react-dom/server";
-// import App from "../App";
-// import config from "../config.json";
-// import axios from "axios";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
+import App from "../App";
+import config from "./config.json";
 
 const indexFile = `
 <!DOCTYPE html>
@@ -19,6 +15,8 @@ const indexFile = `
       content="Web site created using create-react-app"
     />
     <title>React App SSR</title>
+    <script defer="defer" src="${ASSET_MAIN_JS_FILE_SRC}"></script>
+    <link href="${ASSET_MAIN_CSS_FILE_SRC}" rel="stylesheet">
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -29,45 +27,39 @@ const indexFile = `
 `;
 
 const handler = async function (event, context, callback) {
-  try {
-    const request = event.Records[0].cf.request;
-    // console.log(request);
-    console.log("hello")
-    if (request.uri === "/edgessr") {
-      // const url = config.SSRApiStack.apiurl;
-      // const result = await axios.get(url);
-      // const app = ReactDOMServer.renderToString(<App />);
-      const html = indexFile.replace(
-        '<div id="root"></div>',
-        `<div id="root">server side rendered</div>`
-      );
-      const response = {
-        status: "200",
-        statusDescription: "OK",
-        headers: {
-          "cache-control": [
-            {
-              "key": "Cache-Control",
-              "value": "max-age=100"
-            }
-          ],
-          "content-type": [
-            {
-              "key": "Content-Type",
-              "value": "text/html"
-            }
-          ]
-        },
-        body: html,
-      };
-      callback(null, response)
-    } else {
-      return request;
+    try {
+        const request = event.Records[0].cf.request;
+        // console.log(request);
+        const app = ReactDOMServer.renderToString(<App/>);
+        const html = indexFile.replace(
+            '<div id="root"></div>',
+            // `<div id="root">server side rendered</div>`
+            `<div id="root">${app}</div>`
+        );
+        const response = {
+            status: "200",
+            statusDescription: "OK",
+            headers: {
+                "cache-control": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "max-age=100"
+                    }
+                ],
+                "content-type": [
+                    {
+                        "key": "Content-Type",
+                        "value": "text/html"
+                    }
+                ]
+            },
+            body: html,
+        };
+        callback(null, response)
+    } catch (error) {
+        console.log(`Error ${error.message}`);
+        return `Error ${error}`;
     }
-  } catch (error) {
-    console.log(`Error ${error.message}`);
-    return `Error ${error}`;
-  }
 };
 
 export {handler}
