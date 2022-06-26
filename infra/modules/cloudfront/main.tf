@@ -41,8 +41,6 @@ resource "aws_cloudfront_distribution" "support_cf_distribution" {
   enabled         = true
   is_ipv6_enabled = true
 
-  default_root_object = "index.html"
-
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cloudfront_access_logs_bucket.bucket_domain_name
