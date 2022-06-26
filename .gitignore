@@ -1,0 +1,5 @@
+.terraform*
+backup_infra
+terraform.tfstate*
+react_ssr_handler.zip
+.idea
