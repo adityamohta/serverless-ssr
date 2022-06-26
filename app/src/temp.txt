@@ -1,0 +1,33 @@
+{
+  "uri": "/edgessr2",
+  "method": "GET",
+  "clientIp": "2001:cdba::3257:9652",
+  "headers": {
+    "host": [
+      {
+        "key": "Host",
+        "value": "d123.cf.net"
+      }
+    ]
+  }
+}
+
+{
+  "status": "200",
+  "statusDescription": "OK",
+  "headers": {
+    "cache-control": [
+      {
+        "key": "Cache-Control",
+        "value": "max-age=100"
+      }
+    ],
+    "content-type": [
+      {
+        "key": "Content-Type",
+        "value": "text/html"
+      }
+    ]
+  },
+  "body": "\n<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <meta name=\"theme-color\" content=\"#000000\" />\n    <meta\n      name=\"description\"\n      content=\"Web site created using create-react-app\"\n    />\n    <title>React App SSR</title>\n  </head>\n  <body>\n    <noscript>You need to enable JavaScript to run this app.</noscript>\n    <div id=\"root\">server side rendered</div>\n    <div>Rendered on Edge</div>\n  </body>\n</html>\n"
+}
